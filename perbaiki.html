@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perbaiki Data — KPU Kabupaten Buton Selatan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,540;9..144,620&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f7fb;
+    --paper-2:#e4eef9;
+    --ink:#1b2436;
+    --ink-soft:#5b6b85;
+    --line:#d7e3f0;
+    --red:#2f7dd8;
+    --red-deep:#235fb0;
+    --gold:#2fa864;
+    --danger:#ff5b5b;
+  }
+  [data-theme="dark"]{
+    --paper:#141225; --paper-2:#1c1a33; --ink:#eef2fa; --ink-soft:#aab4c8; --line:#2c2a48; --red:#4c94e8; --red-deep:#7db3ee; --gold:#43c17c; --danger:#ff6b6b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family:'Public Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  body::before{
+    content:'';
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: radial-gradient(var(--line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity:.45;
+  }
+  a{ text-decoration:none; color:inherit; }
+  .serif{ font-family:'Fraunces', serif; }
+
+  header{
+    position:relative; z-index:1;
+    border-bottom: 1px solid var(--line);
+    padding: 22px 0;
+  }
+  .header-inner{
+    max-width: 680px; margin:0 auto;
+    padding: 0 28px;
+    display:flex; align-items:center; gap:14px;
+  }
+  .mark{
+    width:44px; height:44px; flex-shrink:0;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--paper-2);
+    display:flex; align-items:center; justify-content:center;
+    padding:6px;
+  }
+  .mark img{ width:100%; height:100%; object-fit:contain; }
+  .header-inner .org{ font-size:11.5px; color: var(--ink-soft); margin:0; }
+  .header-inner h1{ font-size:15.5px; font-weight:600; margin:1px 0 0; }
+  .header-inner .back-link{
+    margin-left:auto; font-size:12.5px; font-weight:600; color: var(--ink-soft);
+    display:inline-flex; align-items:center; gap:6px;
+    transition: color .2s ease;
+  }
+  .header-inner .back-link:hover{ color: var(--red); }
+
+  .wrap{ max-width:680px; margin:0 auto; padding: 44px 28px 60px; position:relative; z-index:1; flex:1; width:100%; }
+
+  .panel{
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--gold);
+    border-radius: 16px;
+    padding: 32px 28px;
+  }
+  .panel .kicker{
+    display:inline-block;
+    background: var(--paper); border: 1px solid var(--line); color: var(--ink-soft);
+    font-size:11.5px; font-weight:600; letter-spacing:.03em;
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 16px;
+  }
+  .panel h2{ font-size:22px; font-weight:620; margin:0 0 8px; color: var(--ink); line-height:1.3; }
+  .panel .desc{ font-size:14px; color: var(--ink-soft); margin:0 0 28px; line-height:1.6; }
+
+  label{ display:block; font-size:13px; font-weight:600; margin: 0 0 8px; color: var(--ink); }
+  .form-group{ margin-bottom: 18px; }
+  
+  .search-row{ display:flex; gap:12px; align-items:flex-start; }
+  .input-wrapper{ flex:1; }
+  input{
+    width:100%;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 14.5px;
+    font-family: inherit;
+    outline:none;
+    transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  input:focus{ border-color: var(--red); box-shadow: 0 0 0 3px rgba(76, 148, 232, 0.15); }
+  input:disabled{ opacity: .65; cursor: not-allowed; }
+  input.invalid{ border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15); }
+  .err{ font-size:12.5px; color: var(--danger); margin-top:6px; display:none; font-weight:500; }
+  .err.show{ display:block; }
+
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    font-family:'Public Sans', sans-serif; font-size:14px; font-weight:600;
+    padding: 13.5px 22px; border-radius: 10px;
+    border: 1.5px solid transparent;
+    cursor:pointer;
+    transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    flex-shrink:0;
+  }
+  .btn:active { transform: scale(0.96) !important; }
+  .btn:disabled { opacity: 0.65; cursor: default; transform: none !important; box-shadow: none !important; }
+  
+  .btn-primary { 
+    background: var(--red); color: #f5f9ff; 
+    box-shadow: 0 4px 14px rgba(47, 125, 216, 0.25);
+  }
+  .btn-primary:hover { 
+    background: var(--red-deep); transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(47, 125, 216, 0.4);
+  }
+
+  .btn-save {
+    width: 100%;
+    margin-top: 12px;
+    background: var(--gold); color: #fff;
+    box-shadow: 0 4px 14px rgba(67, 193, 124, 0.25);
+  }
+  .btn-save:hover {
+    filter: brightness(0.95); transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(67, 193, 124, 0.4);
+  }
+
+  .alert{
+    margin-top: 20px;
+    display:none; align-items:flex-start; gap:10px;
+    padding: 14px 16px; border-radius: 12px;
+    font-size: 13.5px; line-height:1.5; font-weight:500;
+    border: 1px solid transparent;
+    animation: fadeIn .3s ease forwards;
+  }
+  .alert.show{ display:flex; }
+  .alert.error{ background: rgba(255,107,107,0.1); color: var(--danger); border-color: rgba(255,107,107,0.2); }
+  .alert.ok{ background: rgba(67,193,124,0.1); color: var(--gold); border-color: rgba(67,193,124,0.2); }
+  .alert svg{ flex-shrink:0; margin-top:2px; }
+
+  .edit-block{ 
+    margin-top: 32px; 
+    display:none; 
+    padding-top:28px; 
+    border-top:1px dashed var(--line); 
+  }
+  .edit-block.show{ display:block; animation: fadeUpText .5s ease forwards; }
+
+  @media (max-width: 500px){
+    .search-row{ flex-direction:column; align-items:stretch; }
+    .btn{ width:100%; }
+  }
+
+  footer{
+    max-width:680px; margin:auto auto 0; padding: 22px 28px 34px;
+    border-top:1px solid var(--line);
+    font-size:12px; color: var(--ink-soft);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;
+    position:relative; z-index:1; width:100%;
+  }
+
+  /* --- ANIMASI UI --- */
+  @keyframes fadeUpText {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  .panel { animation: fadeUpText 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .anim-item { opacity: 0; animation: fadeUpText 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .anim-1 { animation-delay: 0.1s; }
+  .anim-2 { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="mark"><img src="https://www.kpu.go.id/images/1627539868logo-kpu.png" alt="Logo KPU"></div>
+    <div>
+      <p class="org">KPU Kabupaten Buton Selatan</p>
+      <h1>Perbaiki Data</h1>
+    </div>
+    <a href="index.html" class="back-link">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Kembali
+    </a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="panel">
+    <span class="kicker anim-item anim-1">Perbaikan Data</span>
+    <h2 class="serif anim-item anim-1">Perbaiki Data Sertifikat</h2>
+    <p class="desc anim-item anim-1">Salah tulis nama, nomor HP, atau instansi saat mengisi presensi? Cari data Anda dengan email untuk memperbaikinya.</p>
+
+    <div class="anim-item anim-2">
+      <label for="email">Alamat Email Terdaftar</label>
+      <div class="search-row">
+        <div class="input-wrapper">
+          <input type="email" id="email" placeholder="nama@email.com" autocomplete="email">
+          <div class="err" id="err-email"></div>
+        </div>
+        <button class="btn btn-primary" id="findBtn">Cari Data</button>
+      </div>
+
+      <div class="alert error" id="statusError">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span id="statusErrorText"></span>
+      </div>
+      
+      <div class="alert ok" id="statusOk">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        <span>Data berhasil diperbarui. Sertifikat akan langsung memakai data terbaru ini.</span>
+      </div>
+    </div>
+
+    <div class="edit-block" id="editBlock">
+      <div class="form-group">
+        <label for="nama">Nama Lengkap</label>
+        <input type="text" id="nama" placeholder="Nama sesuai identitas">
+      </div>
+      
+      <div class="form-group">
+        <label for="hp">Nomor WhatsApp / HP</label>
+        <input type="tel" id="hp" placeholder="08xxxxxxxxxx">
+      </div>
+      
+      <div class="form-group">
+        <label for="instansi">Instansi / Organisasi</label>
+        <input type="text" id="instansi" placeholder="KPU Busel / Bawaslu / Umum dll.">
+      </div>
+
+      <button class="btn btn-save" id="saveBtn">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>Komisi Pemilihan Umum Kabupaten Buton Selatan</span>
+  <span>Provinsi Sulawesi Tenggara</span>
+</footer>
+
+<script>
+  /* URL Web App Apps Script (Samakan dengan yang ada di index.html) */
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBxuPU2o6QS8LBd-yomBNE4dWYAEG2PB0qnawCHte7YNVH2dVwM8fDQ55jQGhBlxo/exec';
+
+  var emailInput = document.getElementById('email');
+  var findBtn = document.getElementById('findBtn');
+  var editBlock = document.getElementById('editBlock');
+  var saveBtn = document.getElementById('saveBtn');
+  var foundEmail = '';
+
+  function setError(msg){
+    var err = document.getElementById('err-email');
+    if(msg){ emailInput.classList.add('invalid'); err.textContent = msg; err.classList.add('show'); }
+    else{ emailInput.classList.remove('invalid'); err.textContent=''; err.classList.remove('show'); }
+  }
+  function showStatusError(msg){
+    document.getElementById('statusErrorText').textContent = msg;
+    document.getElementById('statusError').classList.add('show');
+    document.getElementById('statusOk').classList.remove('show');
+  }
+  function hideStatus(){
+    document.getElementById('statusError').classList.remove('show');
+    document.getElementById('statusOk').classList.remove('show');
+  }
+
+  emailInput.addEventListener('input', function(){
+    setError('');
+    hideStatus();
+    editBlock.classList.remove('show');
+  });
+
+  function findData(){
+    var email = emailInput.value.trim();
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    setError('');
+    hideStatus();
+    editBlock.classList.remove('show');
+
+    if(!email || !emailPattern.test(email)){
+      setError('Masukkan alamat email yang valid.');
+      return;
+    }
+    if(!SCRIPT_URL || SCRIPT_URL.indexOf('script.google.com') === -1){
+      showStatusError('URL backend belum diatur pada variabel SCRIPT_URL.');
+      return;
+    }
+
+    findBtn.disabled = true;
+    findBtn.textContent = 'Mencari...';
+
+    fetch(SCRIPT_URL + '?action=getRecord&email=' + encodeURIComponent(email))
+      .then(function(res){ return res.json(); })
+      .then(function(result){
+        findBtn.disabled = false;
+        findBtn.textContent = 'Cari Data';
+
+        if(result.status !== 'found'){
+          showStatusError(result.message || 'Email belum tercatat mengisi daftar hadir.');
+          return;
+        }
+
+        foundEmail = result.email;
+        document.getElementById('nama').value = result.nama || '';
+        document.getElementById('hp').value = result.hp || '';
+        document.getElementById('instansi').value = result.instansi || '';
+        editBlock.classList.add('show');
+      })
+      .catch(function(){
+        findBtn.disabled = false;
+        findBtn.textContent = 'Cari Data';
+        showStatusError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda dan coba lagi.');
+      });
+  }
+
+  findBtn.addEventListener('click', findData);
+  emailInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') findData(); });
+
+  saveBtn.addEventListener('click', function(){
+    var nama = document.getElementById('nama').value.trim();
+    var hp = document.getElementById('hp').value.trim();
+    var instansi = document.getElementById('instansi').value.trim();
+    var hpPattern = /^[0-9+ -]{9,15}$/;
+
+    hideStatus();
+
+    if(!nama || !hp || !instansi){
+      showStatusError('Semua kolom wajib diisi untuk menyimpan perubahan.');
+      return;
+    }
+    if(!hpPattern.test(hp)){
+      showStatusError('Masukkan nomor HP yang valid (minimal 9 angka).');
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Menyimpan...';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ mode: 'update', email: foundEmail, nama: nama, hp: hp, instansi: instansi })
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(result){
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Simpan Perubahan';
+
+      if(result.status === 'success'){
+        document.getElementById('statusOk').classList.add('show');
+        document.getElementById('statusError').classList.remove('show');
+        editBlock.classList.remove('show'); // Sembunyikan blok edit setelah sukses
+        return;
+      }
+
+      showStatusError(result.message || 'Gagal menyimpan perubahan. Coba lagi.');
+    })
+    .catch(function(){
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Simpan Perubahan';
+      showStatusError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda dan coba lagi.');
+    });
+  });
+</script>
+
+</body>
+</html>
