@@ -41,7 +41,6 @@
     background-size: 24px 24px;
     opacity:.45;
   }
-  /* Watermark Buku Besar di Latar Belakang Semua Halaman */
   body::after{
     content:'';
     position:fixed; bottom:-10vh; right:-5vw;
@@ -119,7 +118,6 @@
   button.submit:active{ transform: scale(0.97) !important; }
   button.submit:disabled{ opacity:.65; cursor:default; transform:none !important; box-shadow:none !important; background: var(--line); color: var(--ink-soft); }
 
-  /* OVERLAY MODAL */
   .overlay{
     display:none; min-height: 100vh; width:100%; align-items:center; justify-content:center;
     position:fixed; inset:0; background: rgba(10, 8, 18, 0.7); backdrop-filter: blur(4px);
@@ -141,7 +139,19 @@
   .modal.ok .icon{ background: rgba(67,193,124,0.1); color: var(--gold); border: 1px solid rgba(67,193,124,0.2); }
   .modal h3{ font-size:18px; font-weight:600; margin:0 0 10px; color: var(--ink); }
   .modal p{ font-size:14px; color: var(--ink-soft); line-height:1.6; margin:0 0 24px; }
-  
+
+  .modal.cert-modal{ max-width: 480px; }
+  .cert-preview{
+    position:relative; margin: 0 0 18px; border-radius: 12px; overflow:hidden;
+    border: 1px solid var(--line); background: var(--paper);
+    min-height: 120px; display:flex; align-items:center; justify-content:center;
+  }
+  .cert-preview canvas{ display:block; width:100%; height:auto; }
+  .cert-preview.loading canvas{ display:none; }
+  .cert-loading{ display:none; font-size:13px; color: var(--ink-soft); padding: 28px 16px; }
+  .cert-preview.loading .cert-loading{ display:block; }
+  .modal .btn-row{ display:flex; flex-direction:column; gap:10px; }
+
   .modal button{
     width:100%; background: var(--paper); color: var(--ink); 
     border: 1.5px solid var(--line); border-radius:10px; padding: 13px;
@@ -158,7 +168,6 @@
     position:relative; z-index:1; width:100%;
   }
 
-  /* --- ANIMASI UI --- */
   @keyframes fadeUpText { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .panel { animation: fadeUpText 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -187,9 +196,8 @@
   <div class="panel">
     <span class="kicker">Formulir Presensi</span>
     <h2 class="serif">Isi Daftar Hadir Kegiatan</h2>
-    <p class="desc">Bedah Buku Seri 2 "Teknik Alokasi Suara Menajadi Kursi di Parlemen". Pastikan email Anda aktif untuk mempermudah unduh sertifikat nanti.</p>
+    <p class="desc">Bedah Buku Seri 2 "Teknik Alokasi Suara Menjadi Kursi di Parlemen". Pastikan email Anda aktif untuk mempermudah unduh sertifikat nanti.</p>
 
-    <!-- Alert Form Terkunci -->
     <div class="alert warning anim-item anim-1" id="lockAlert">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
       <span>Formulir masih terkunci dan akan terbuka otomatis pada saat kegiatan dimulai.</span>
@@ -232,7 +240,6 @@
   <span>Provinsi Sulawesi Tenggara</span>
 </footer>
 
-<!-- MODAL DUPLIKAT -->
 <div class="overlay" id="overlayReject">
   <div class="modal reject">
     <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></div>
@@ -242,17 +249,24 @@
   </div>
 </div>
 
-<!-- MODAL SUKSES -->
 <div class="overlay" id="overlaySuccess">
-  <div class="modal ok">
+  <div class="modal ok cert-modal">
     <div class="icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
     <h3>Presensi berhasil disimpan</h3>
-    <p>Terima kasih, kehadiran Anda telah tercatat. Anda sudah bisa kembali ke portal utama.</p>
-    <button onclick="window.location.href='index.html'">Kembali ke Portal</button>
+    <p>Terima kasih, kehadiran Anda telah tercatat. Sertifikat Anda sudah siap diunduh di bawah ini.</p>
+
+    <div class="cert-preview loading" id="certPreview">
+      <span class="cert-loading" id="certLoadingText">Memproses sertifikat...</span>
+      <canvas id="certCanvas"></canvas>
+    </div>
+
+    <div class="btn-row">
+      <button id="downloadCertBtn">Unduh Sertifikat</button>
+      <button onclick="window.location.href='index.html'" style="background:transparent; box-shadow:none;">Kembali ke Portal</button>
+    </div>
   </div>
 </div>
 
-<!-- MODAL ERROR -->
 <div class="overlay" id="overlayError">
   <div class="modal reject">
     <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
@@ -265,9 +279,59 @@
 <script>
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBxuPU2o6QS8LBd-yomBNE4dWYAEG2PB0qnawCHte7YNVH2dVwM8fDQ55jQGhBlxo/exec';
 
-  /* ================= PENGATURAN KUNCI WAKTU ================= */
-  // Waktu pembukaan: 21 Oktober 2026, pukul 09:00 WITA.
-  // Format ISO dengan +08:00 (Zona Waktu WITA / UTC+8).
+  var TEMPLATE_URL = 'assets/template-sertifikat.jpg';
+  var NAME_STYLE = {
+    x: 800,
+    y: 462,
+    fontSize: 46,
+    fontFamily: "'Fraunces', serif",
+    fontStyle: 'normal',
+    fontWeight: '600',
+    color: '#241d16',
+    align: 'center'
+  };
+  var certCanvas = document.getElementById('certCanvas');
+  var certCtx = certCanvas.getContext('2d');
+  var certPreviewBox = document.getElementById('certPreview');
+  var certLoadingText = document.getElementById('certLoadingText');
+  var currentCertName = '';
+
+  function drawCertificateAfterAbsen(nama){
+    currentCertName = nama;
+    certPreviewBox.classList.add('loading');
+    certLoadingText.textContent = 'Memproses sertifikat...';
+
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      certCanvas.width = img.naturalWidth;
+      certCanvas.height = img.naturalHeight;
+      certCtx.drawImage(img, 0, 0);
+
+      document.fonts.load(NAME_STYLE.fontWeight + ' ' + NAME_STYLE.fontSize + 'px ' + NAME_STYLE.fontFamily).then(function(){
+        certCtx.font = NAME_STYLE.fontStyle + ' ' + NAME_STYLE.fontWeight + ' ' + NAME_STYLE.fontSize + 'px ' + NAME_STYLE.fontFamily;
+        certCtx.fillStyle = NAME_STYLE.color;
+        certCtx.textAlign = NAME_STYLE.align;
+        certCtx.textBaseline = 'alphabetic';
+        certCtx.fillText(nama, NAME_STYLE.x, NAME_STYLE.y);
+
+        certPreviewBox.classList.remove('loading');
+      });
+    };
+    img.onerror = function(){
+      certLoadingText.textContent = 'Gagal memuat template sertifikat. Anda tetap bisa mengunduhnya nanti lewat menu Sertifikat.';
+    };
+    img.src = TEMPLATE_URL;
+  }
+
+  document.getElementById('downloadCertBtn').addEventListener('click', function(){
+    if(certPreviewBox.classList.contains('loading')) return;
+    var link = document.createElement('a');
+    link.download = 'Sertifikat - ' + (currentCertName || 'Peserta') + '.png';
+    link.href = certCanvas.toDataURL('image/png');
+    link.click();
+  });
+
   var openTime = new Date('2026-10-21T11:30:00+08:00').getTime();
   var lockInterval;
 
@@ -278,29 +342,22 @@
     var alertBox = document.getElementById('lockAlert');
 
     if (now < openTime) {
-      // Masih terkunci
       inputs.forEach(function(input) { input.disabled = true; });
       btn.disabled = true;
       btn.textContent = 'Terkunci';
       alertBox.classList.add('show');
     } else {
-      // Waktunya Terbuka!
       inputs.forEach(function(input) { input.disabled = false; });
       btn.disabled = false;
       btn.textContent = 'Kirim';
       alertBox.classList.remove('show');
       
-      // Hentikan pengecekan jika sudah terbuka
       if (lockInterval) clearInterval(lockInterval);
     }
   }
 
-  // Mulai cek saat halaman dimuat
   checkTimeLock();
-  // Cek berulang setiap 1 detik
   lockInterval = setInterval(checkTimeLock, 1000);
-  /* ========================================================== */
-
 
   function openOverlay(id){ document.getElementById(id).classList.add('show'); }
   function closeOverlay(id){ document.getElementById(id).classList.remove('show'); }
@@ -321,7 +378,6 @@
   document.getElementById('absenForm').addEventListener('submit', function(e){
     e.preventDefault();
     
-    // Keamanan tambahan: cegah submit jika ditembus sebelum waktunya
     if (new Date().getTime() < openTime) return;
 
     if(!SCRIPT_URL || SCRIPT_URL.indexOf('script.google.com') === -1){
@@ -356,7 +412,12 @@
         checkTimeLock();
         return;
       }
-      if(result.status === 'success'){ document.getElementById('absenForm').reset(); openOverlay('overlaySuccess'); return; }
+      if(result.status === 'success'){
+        drawCertificateAfterAbsen(nama);
+        document.getElementById('absenForm').reset();
+        openOverlay('overlaySuccess');
+        return;
+      }
       document.getElementById('errorText').textContent = result.message || 'Terjadi kendala saat menyimpan data. Silakan coba lagi.';
       openOverlay('overlayError');
     }).catch(function(){
