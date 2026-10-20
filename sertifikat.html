@@ -77,7 +77,7 @@
   .panel{
     background: var(--paper-2);
     border: 1px solid var(--line);
-    border-top: 3px solid var(--gold); /* Gunakan highlight emas untuk sertifikat */
+    border-top: 3px solid var(--gold);
     border-radius: 16px;
     padding: 32px 28px;
   }
@@ -177,7 +177,6 @@
     position:relative; z-index:1; width:100%;
   }
 
-  /* --- ANIMASI UI --- */
   @keyframes fadeUpText {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -244,25 +243,20 @@
 </footer>
 
 <script>
-  /* ================= KONFIGURASI ================= */
-  // URL Web App Apps Script (Harus sama dengan index.html dan absen.html)
   var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBxuPU2o6QS8LBd-yomBNE4dWYAEG2PB0qnawCHte7YNVH2dVwM8fDQ55jQGhBlxo/exec';
 
-  // Template sertifikat asli Anda.
   var TEMPLATE_URL = 'assets/sertifikat-peserta.jpeg';
 
-  // Pengaturan posisi & gaya teks (Sama dengan versi sebelumnya)
   var NAME_STYLE = {
     x: 800,            
     y: 462,            
     fontSize: 46,
-    fontFamily: "'Fraunces', serif", // Saya ganti ke Fraunces agar serasi dengan UI modern ini
+    fontFamily: "'Fraunces', serif",
     fontStyle: 'normal',
     fontWeight: '600',
     color: '#241d16',
     align: 'center'    
   };
-  /* ================================================= */
 
   var emailInput = document.getElementById('email');
   var findBtn = document.getElementById('findBtn');
@@ -299,7 +293,6 @@
       canvas.height = img.naturalHeight;
       ctx.drawImage(img, 0, 0);
 
-      // Load font sebelum menggambar di Canvas (agar font khusus ter-render dengan benar)
       document.fonts.load(NAME_STYLE.fontWeight + ' ' + NAME_STYLE.fontSize + 'px ' + NAME_STYLE.fontFamily).then(function(){
         ctx.font = NAME_STYLE.fontStyle + ' ' + NAME_STYLE.fontWeight + ' ' + NAME_STYLE.fontSize + 'px ' + NAME_STYLE.fontFamily;
         ctx.fillStyle = NAME_STYLE.color;
